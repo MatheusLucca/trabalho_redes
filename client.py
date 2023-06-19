@@ -1,35 +1,28 @@
 import socket
 
-# Função para enviar requisição ao servidor e receber a resposta
 def enviar_requisicao(requisicao, endereco_servidor):
     # Criação do socket
     cliente = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
-        # Conexão com o servidor
         cliente.connect(endereco_servidor)
 
-        # Envia a requisição ao servidor
         cliente.send(requisicao.encode())
 
-        # Recebe a resposta do servidor
         resposta = cliente.recv(1024).decode()
 
-        # Fecha a conexão com o servidor
         cliente.close()
 
         return resposta
     except:
         return "Não foi possível conectar ao servidor."
 
-# Solicita o endereço IP e a porta do servidor
 endereco_ip = input("Digite o endereço IP do servidor: ")
 porta = int(input("Digite o número da porta do servidor: "))
 
-# Cria a tupla de endereço do servidor
+
 endereco_servidor = (endereco_ip, porta)
 while True:
 
-    # Exibe o menu de opções
     print("=== MENU ===")
     print("1. Criar diretório")
     print("2. Remover diretório")
@@ -40,7 +33,6 @@ while True:
 
 
 
-    # Solicita a opção ao usuário
     opcao = input("Selecione uma opção: ")
 
     if opcao == "1":

@@ -1,7 +1,7 @@
 import socket
 import os
 
-# Função para criar diretório
+
 def criar_diretorio(diretorio):
     if not os.path.exists(diretorio):
         os.makedirs(diretorio)
@@ -9,7 +9,6 @@ def criar_diretorio(diretorio):
     else:
         return "O diretório já existe."
 
-# Função para remover diretório
 def remover_diretorio(diretorio):
     if os.path.exists(diretorio):
         os.rmdir(diretorio)
@@ -17,7 +16,6 @@ def remover_diretorio(diretorio):
     else:
         return "O diretório não existe."
 
-# Função para listar conteúdo de diretório
 def listar_conteudo(diretorio):
     if os.path.exists(diretorio):
         conteudo = os.listdir(diretorio)
@@ -25,7 +23,7 @@ def listar_conteudo(diretorio):
     else:
         return "O diretório não existe."
 
-# Função para enviar arquivo
+
 def enviar_arquivo(arquivo, diretorio_destino):
     if os.path.exists(arquivo):
         with open(arquivo, "rb") as file:
@@ -38,7 +36,6 @@ def enviar_arquivo(arquivo, diretorio_destino):
     else:
         return "O arquivo não existe."
 
-# Função para remover arquivo
 def remover_arquivo(arquivo):
     if os.path.exists(arquivo):
         os.remove(arquivo)
@@ -46,17 +43,16 @@ def remover_arquivo(arquivo):
     else:
         return "O arquivo não existe."
 
-# Configurações do servidor
-HOST = '127.0.0.1'  # Endereço IP do servidor
-PORT = 12345  # Porta de conexão
+
+HOST = '127.0.0.1'  
+PORT = 12345  
 
 # Criação do socket
 servidor = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-# Vincula o socket com o endereço e porta
+# Seta o socket para reutilizar o endereço
 servidor.bind((HOST, PORT))
 
-# Aguarda uma conexão
 servidor.listen()
 
 print("Servidor aguardando conexões...")
