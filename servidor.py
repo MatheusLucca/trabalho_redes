@@ -1,20 +1,19 @@
 import socket
 import os
-
+import shutil
 
 def criar_diretorio(diretorio):
     if not os.path.exists(diretorio):
         os.makedirs(diretorio)
         return "Diretório criado com sucesso."
-    else:
-        return "O diretório já existe."
+    return "O diretório já existe."
 
 def remover_diretorio(diretorio):
-    if os.path.exists(diretorio):
-        os.rmdir(diretorio)
-        return "Diretório removido com sucesso."
-    else:
-        return "O diretório não existe."
+    try:
+        shutil.rmtree(diretorio)
+        return f"Diretório '{diretorio}' removido com sucesso."
+    except OSError as e:
+        return f"Erro ao remover diretório '{diretorio}': {str(e)}"
 
 def listar_conteudo(diretorio):
     if os.path.exists(diretorio):
@@ -45,7 +44,7 @@ def remover_arquivo(arquivo):
 
 
 HOST = '127.0.0.1'  
-PORT = 12345  
+PORT = 11 
 
 # Criação do socket
 servidor = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -87,5 +86,5 @@ while True:
         # Envia a resposta ao cliente
         cliente.send(resposta.encode())
 
-    # Fecha a conexão com o cliente
+    # Fecha a conexão 
     cliente.close()

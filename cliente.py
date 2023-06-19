@@ -42,9 +42,13 @@ while True:
         print(resposta)
     elif opcao == "2":
         diretorio = input("Informe o nome do diretório a ser removido: ")
-        requisicao = f"remover_diretorio {diretorio}"
-        resposta = enviar_requisicao(requisicao, endereco_servidor)
-        print(resposta)
+        confirmacao = input(f"Tem certeza de que deseja remover o diretório '{diretorio}' e todos os arquivos? (s/n): ")
+        if confirmacao.lower() == 's':
+            requisicao = f"remover_diretorio {diretorio}"
+            resposta = enviar_requisicao(requisicao, endereco_servidor)
+            print(resposta)
+        else:
+            print("Remoção cancelada.")
     elif opcao == "3":
         diretorio = input("Informe o nome do diretório a ser listado: ")
         requisicao = f"listar_conteudo {diretorio}"
