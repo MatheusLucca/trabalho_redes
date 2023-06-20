@@ -39,6 +39,7 @@ def enviar_arquivo(nome_arquivo, endereco_servidor, porta):
         return f"Erro ao enviar arquivo: {str(e)}"
 
 
+
 endereco_ip = input("Digite o endereço IP do servidor: ")
 porta = int(input("Digite o número da porta do servidor: "))
 
@@ -79,7 +80,7 @@ while True:
         print(resposta)
     elif opcao == "4":
         nome_arquivo = input("Informe o nome do arquivo a ser enviado: ")
-        resposta = enviar_arquivo(nome_arquivo, endereco_servidor, porta)
+        resposta = enviar_arquivo(nome_arquivo, endereco_servidor, int(porta))
         print(resposta)
     elif opcao == "5":
         arquivo = input("Informe o caminho do arquivo a ser removido: ")

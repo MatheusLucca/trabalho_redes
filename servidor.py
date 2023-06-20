@@ -50,7 +50,7 @@ def remover_arquivo(arquivo):
 
 
 HOST = '10.6.80.122'  
-PORT = 3007
+PORT = 3008
 
 # Criação do socket
 servidor = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
