@@ -16,6 +16,29 @@ def enviar_requisicao(requisicao, endereco_servidor):
     except:
         return "Não foi possível conectar ao servidor."
 
+
+def enviar_arquivo(nome_arquivo, endereco_servidor, porta):
+    try:
+        with open(nome_arquivo, 'rb') as arquivo:
+            # Cria o socket e se conecta ao servidor
+            cliente_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            cliente_socket.connect((endereco_servidor, porta))
+            
+            # Envia o nome do arquivo para o servidor
+            cliente_socket.sendall(nome_arquivo.encode())
+
+            # Envia o conteúdo do arquivo em chunks
+            for dados in arquivo:
+                cliente_socket.sendall(dados)
+
+            # Finaliza a conexão
+            cliente_socket.close()
+            
+            return f"Arquivo '{nome_arquivo}' enviado com sucesso."
+    except Exception as e:
+        return f"Erro ao enviar arquivo: {str(e)}"
+
+
 endereco_ip = input("Digite o endereço IP do servidor: ")
 porta = int(input("Digite o número da porta do servidor: "))
 
@@ -55,10 +78,8 @@ while True:
         resposta = enviar_requisicao(requisicao, endereco_servidor)
         print(resposta)
     elif opcao == "4":
-        arquivo = input("Informe o caminho do arquivo a ser enviado: ")
-        diretorio_destino = input("Informe o diretório de destino: ")
-        requisicao = f"enviar_arquivo {arquivo} {diretorio_destino}"
-        resposta = enviar_requisicao(requisicao, endereco_servidor)
+        nome_arquivo = input("Informe o nome do arquivo a ser enviado: ")
+        resposta = enviar_arquivo(nome_arquivo, endereco_servidor, porta)
         print(resposta)
     elif opcao == "5":
         arquivo = input("Informe o caminho do arquivo a ser removido: ")

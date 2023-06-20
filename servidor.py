@@ -23,17 +23,23 @@ def listar_conteudo(diretorio):
         return "O diretório não existe."
 
 
-def enviar_arquivo(arquivo, diretorio_destino):
-    if os.path.exists(arquivo):
-        with open(arquivo, "rb") as file:
-            conteudo = file.read()
-
-        caminho_destino = os.path.join(diretorio_destino, os.path.basename(arquivo))
-        with open(caminho_destino, "wb") as file_destino:
-            file_destino.write(conteudo)
-        return "Arquivo enviado com sucesso."
-    else:
-        return "O arquivo não existe."
+def receber_arquivo(cliente_socket):
+    try:
+        # Recebe o nome do arquivo do cliente
+        nome_arquivo = cliente_socket.recv(1024).decode()
+        
+        # Abre o arquivo em modo de escrita binária
+        with open(nome_arquivo, 'wb') as arquivo:
+            # Recebe os chunks do arquivo e escreve no arquivo local
+            while True:
+                dados = cliente_socket.recv(1024)
+                if not dados:
+                    break
+                arquivo.write(dados)
+        
+        return f"Arquivo '{nome_arquivo}' recebido com sucesso."
+    except Exception as e:
+        return f"Erro ao receber arquivo: {str(e)}"
 
 def remover_arquivo(arquivo):
     if os.path.exists(arquivo):
@@ -43,8 +49,8 @@ def remover_arquivo(arquivo):
         return "O arquivo não existe."
 
 
-HOST = '127.0.0.1'  
-PORT = 11 
+HOST = '10.6.80.122'  
+PORT = 3007
 
 # Criação do socket
 servidor = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -76,8 +82,9 @@ while True:
             resposta = remover_diretorio(partes[1])
         elif comando == "listar_conteudo":
             resposta = listar_conteudo(partes[1])
-        elif comando == "enviar_arquivo":
-            resposta = enviar_arquivo(partes[1], partes[2])
+        if requisicao.startswith("enviar_arquivo"):
+            resposta = receber_arquivo(cliente)
+            cliente.sendall(resposta.encode())
         elif comando == "remover_arquivo":
             resposta = remover_arquivo(partes[1])
         else:
