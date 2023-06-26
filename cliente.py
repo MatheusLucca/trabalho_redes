@@ -1,4 +1,6 @@
+# -*- coding: utf-8 -*-
 import socket
+import os
 
 def enviar_requisicao(requisicao, endereco_servidor):
     # Criação do socket
@@ -17,29 +19,22 @@ def enviar_requisicao(requisicao, endereco_servidor):
         return "Não foi possível conectar ao servidor."
 
 
-def enviar_arquivo(nome_arquivo, endereco_servidor, porta):
-    try:
-        with open(nome_arquivo, 'rb') as arquivo:
-            # Cria o socket e se conecta ao servidor
-            cliente_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            cliente_socket.connect((endereco_servidor, porta))
-            
-            # Envia o nome do arquivo para o servidor
-            cliente_socket.sendall(nome_arquivo.encode())
-
-            # Envia o conteúdo do arquivo em chunks
-            for dados in arquivo:
-                cliente_socket.sendall(dados)
-
-            # Finaliza a conexão
-            cliente_socket.close()
-            
-            return f"Arquivo '{nome_arquivo}' enviado com sucesso."
-    except Exception as e:
-        return f"Erro ao enviar arquivo: {str(e)}"
-
-
-
+def enviar_arquivo(nome_arquivo, caminho_arquivo, endereco_servidor):
+    SEPARATOR = " "
+    BUFFER_SIZE = 4096
+    filesize = os.path.getsize(nome_arquivo)
+    cliente_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    cliente_socket.connect(endereco_servidor)
+    cliente_socket.send(f"enviar_arquivo{SEPARATOR}{nome_arquivo}{SEPARATOR}{filesize}{SEPARATOR}{caminho_arquivo} ".encode())
+    f = open(nome_arquivo, "rb")
+    progress = 0
+    while True:
+        bytes_read = f.read(BUFFER_SIZE)
+        cliente_socket.sendall(bytes_read)
+        if not bytes_read:
+            print('Envio finalizado!')
+            break
+        progress = progress+len(bytes_read)
 endereco_ip = input("Digite o endereço IP do servidor: ")
 porta = int(input("Digite o número da porta do servidor: "))
 
@@ -48,25 +43,25 @@ endereco_servidor = (endereco_ip, porta)
 while True:
 
     print("=== MENU ===")
-    print("1. Criar diretório")
-    print("2. Remover diretório")
-    print("3. Listar conteúdo de diretório")
+    print("1. Criar diretorio")
+    print("2. Remover diretorio")
+    print("3. Listar conteúdo de diretorio")
     print("4. Enviar arquivo")
     print("5. Remover arquivo")
     print("0. Sair")
 
 
 
-    opcao = input("Selecione uma opção: ")
+    opcao = input("Selecione uma opcao: ")
 
     if opcao == "1":
-        diretorio = input("Informe o nome do diretório a ser criado: ")
+        diretorio = input("Informe o nome do diretorio a ser criado: ")
         requisicao = f"criar_diretorio {diretorio}"
         resposta = enviar_requisicao(requisicao, endereco_servidor)
         print(resposta)
     elif opcao == "2":
-        diretorio = input("Informe o nome do diretório a ser removido: ")
-        confirmacao = input(f"Tem certeza de que deseja remover o diretório '{diretorio}' e todos os arquivos? (s/n): ")
+        diretorio = input("Informe o nome do diretorio a ser removido: ")
+        confirmacao = input(f"Tem certeza de que deseja remover o diretorio '{diretorio}' e todos os arquivos? (s/n): ")
         if confirmacao.lower() == 's':
             requisicao = f"remover_diretorio {diretorio}"
             resposta = enviar_requisicao(requisicao, endereco_servidor)
@@ -80,7 +75,8 @@ while True:
         print(resposta)
     elif opcao == "4":
         nome_arquivo = input("Informe o nome do arquivo a ser enviado: ")
-        resposta = enviar_arquivo(nome_arquivo, endereco_servidor, int(porta))
+        caminho_arquivo = input("Informe o caminho onde o arquivo será salvo:")
+        resposta = enviar_arquivo(nome_arquivo, caminho_arquivo, endereco_servidor)
         print(resposta)
     elif opcao == "5":
         arquivo = input("Informe o caminho do arquivo a ser removido: ")

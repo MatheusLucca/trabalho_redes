@@ -1,7 +1,11 @@
+# -*- coding: utf-8 -*-
 import socket
 import os
 import shutil
 
+
+
+BUFFER_SIZE = 4096
 def criar_diretorio(diretorio):
     if not os.path.exists(diretorio):
         os.makedirs(diretorio)
@@ -23,23 +27,38 @@ def listar_conteudo(diretorio):
         return "O diretório não existe."
 
 
-def receber_arquivo(cliente_socket):
+def receber_arquivo(cliente_socket, partes):
     try:
-        # Recebe o nome do arquivo do cliente
-        nome_arquivo = cliente_socket.recv(1024).decode()
+
+        mensagem = partes
+        pathArq = mensagem[1]
+        filesize = mensagem[2]
+        pathDest= mensagem[3]
+        filename = os.path.basename(pathArq)
+        filesize = int(filesize)
+        if not pathDest:
+            pathDest = filename
+        else:
+            pathDest = pathDest +'\\'+ filename
+        f = open(pathDest, "wb")
+        progress=0
+        pack = 0
+
+        while True:
+            bytes_read = cliente_socket.recv(BUFFER_SIZE)
+            pack = pack + 1
         
-        # Abre o arquivo em modo de escrita binária
-        with open(nome_arquivo, 'wb') as arquivo:
-            # Recebe os chunks do arquivo e escreve no arquivo local
-            while True:
-                dados = cliente_socket.recv(1024)
-                if not dados:
-                    break
-                arquivo.write(dados)
-        
-        return f"Arquivo '{nome_arquivo}' recebido com sucesso."
-    except Exception as e:
-        return f"Erro ao receber arquivo: {str(e)}"
+            if len(bytes_read) < BUFFER_SIZE:
+                f.write(bytes_read)
+                progress = progress + len(bytes_read)
+                break
+            
+            progress = progress + len(bytes_read)
+            f.write(bytes_read)
+        return "Arquivo enviado!"
+    except Exception:
+        return "Houve um erro!"
+
 
 def remover_arquivo(arquivo):
     if os.path.exists(arquivo):
@@ -49,8 +68,8 @@ def remover_arquivo(arquivo):
         return "O arquivo não existe."
 
 
-HOST = '10.6.80.122'  
-PORT = 3008
+HOST = '127.0.0.1'  
+PORT = 3005
 
 # Criação do socket
 servidor = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -68,23 +87,24 @@ while True:
     print("Conexão estabelecida com", endereco)
 
     # Recebe a requisição do cliente
-    requisicao = cliente.recv(1024).decode()
+    
+    requisicao = cliente.recv(BUFFER_SIZE).decode(errors='ignore')
 
-    # Separa a requisição em partes
-    partes = requisicao.split()
+    partes = requisicao.split(' ')
 
     if len(partes) > 0:
         comando = partes[0]
-
+        print("Comando recebido:", comando)
         if comando == "criar_diretorio":
             resposta = criar_diretorio(partes[1])
         elif comando == "remover_diretorio":
             resposta = remover_diretorio(partes[1])
         elif comando == "listar_conteudo":
             resposta = listar_conteudo(partes[1])
-        if requisicao.startswith("enviar_arquivo"):
-            resposta = receber_arquivo(cliente)
-            cliente.sendall(resposta.encode())
+        elif requisicao.startswith("enviar_arquivo"):
+            print('aa')
+            resposta = receber_arquivo(cliente, partes)
+            print(resposta)
         elif comando == "remover_arquivo":
             resposta = remover_arquivo(partes[1])
         else:
