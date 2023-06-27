@@ -27,14 +27,12 @@ def enviar_arquivo(nome_arquivo, caminho_arquivo, endereco_servidor):
     cliente_socket.connect(endereco_servidor)
     cliente_socket.send(f"enviar_arquivo{SEPARATOR}{nome_arquivo}{SEPARATOR}{filesize}{SEPARATOR}{caminho_arquivo} ".encode())
     f = open(nome_arquivo, "rb")
-    progress = 0
     while True:
         bytes_read = f.read(BUFFER_SIZE)
         cliente_socket.sendall(bytes_read)
         if not bytes_read:
             print('Envio finalizado!')
             break
-        progress = progress+len(bytes_read)
 endereco_ip = input("Digite o endereço IP do servidor: ")
 porta = int(input("Digite o número da porta do servidor: "))
 

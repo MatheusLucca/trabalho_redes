@@ -41,7 +41,6 @@ def receber_arquivo(cliente_socket, partes):
         else:
             pathDest = pathDest +'\\'+ filename
         f = open(pathDest, "wb")
-        progress=0
         pack = 0
 
         while True:
@@ -50,10 +49,7 @@ def receber_arquivo(cliente_socket, partes):
         
             if len(bytes_read) < BUFFER_SIZE:
                 f.write(bytes_read)
-                progress = progress + len(bytes_read)
                 break
-            
-            progress = progress + len(bytes_read)
             f.write(bytes_read)
         return "Arquivo enviado!"
     except Exception:
